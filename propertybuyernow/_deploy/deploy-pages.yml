@@ -1,0 +1,39 @@
+# GitHub Pages deployment workflow for propertybuyernow.co.uk
+#
+# NOTE: this file lives in _deploy/ because the site currently sits inside a
+# shared repository. Once the site has its own repository (see README),
+# move this file to .github/workflows/deploy-pages.yml in that repo,
+# and it will publish the site on every push to main.
+#
+# Repo settings required: Settings → Pages → Source: "GitHub Actions".
+
+name: Deploy site to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: .
+      - id: deployment
+        uses: actions/deploy-pages@v4
